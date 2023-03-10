@@ -1,0 +1,67 @@
+name: ci
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./Dockerfile-nextcloud
+            image: mahoneko/nextcloud:latest
+            
+          - dockerfile: ./Dockerfile-postfix
+            image: mahoneko/postfix:latest
+
+          - dockerfile: ./Dockerfile-opendkim
+            image: mahoneko/opendkim:latest
+
+          - dockerfile: ./Dockerfile-dovecot
+            image: mahoneko/dovecot:latest
+
+          - dockerfile: ./Dockerfile-transmission
+            image: mahoneko/transmission:latest
+
+          - dockerfile: ./Dockerfile-minidlna
+            image: mahoneko/minidlna:latest
+
+          - dockerfile: ./Dockerfile-sonarr
+            image: mahoneko/sonarr:latest
+
+          - dockerfile: ./Dockerfile-radarr
+            image: mahoneko/radarr:latest
+
+          - dockerfile: ./Dockerfile-prowlarr
+            image: mahoneko/prowlarr:latest
+            
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          platforms: |
+            linux/amd64
+            linux/arm64
+          push: true
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ matrix.image }}
+        

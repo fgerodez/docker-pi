@@ -1,0 +1,40 @@
+FROM debian:12-slim
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# Install necessary packages and clean up the package cache
+RUN apt update && apt install -yqq \
+	curl \
+	sqlite3 \
+	wget \
+    libicu-dev \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user for Prowlarr and set up its directory
+RUN useradd -U --system --no-create-home --shell=/sbin/nologin prowlarr \
+	&& mkdir /var/lib/prowlarr \
+    && chown prowlarr:prowlarr /var/lib/prowlarr
+
+# Determine and download the appropriate Prowlarr release based on architecture
+RUN ARCH=$(dpkg --print-architecture) \
+    && DLBASE="https://prowlarr.servarr.com/v1/update/master/updatefile?os=linux&runtime=netcore" \
+    && case "$ARCH" in \
+        "amd64") DLURL="${DLBASE}&arch=x64" ;; \
+        "armhf") DLURL="${DLBASE}&arch=arm" ;; \
+        "arm64") DLURL="${DLBASE}&arch=arm64" ;; \
+        *) \
+            echo "Architecture non prise en charge: $ARCH" \
+            && exit 1 \
+            ;; \
+        esac \
+    && wget --content-disposition "$DLURL" -O prowlarr.tar.gz \
+    && tar -xzf prowlarr.tar.gz -C /opt/ \
+    && chown -R prowlarr:prowlarr /opt/Prowlarr \
+    && rm prowlarr.tar.gz
+
+USER prowlarr
+WORKDIR /opt/Prowlarr
+
+CMD ["/opt/Prowlarr/Prowlarr", "-nobrowser", "-data=/var/lib/prowlarr"]
+
+

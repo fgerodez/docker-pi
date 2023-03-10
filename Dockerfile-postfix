@@ -1,0 +1,15 @@
+FROM debian:12-slim
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt update && apt install -yqq \
+	postfix \
+	postfix-sqlite \
+	postfix-policyd-spf-python \
+	&& rm -rf /var/lib/apt/lists/*
+
+COPY ./config/postfix/postfix-init.sh /
+
+RUN chmod +x /postfix-init.sh
+
+CMD ["/postfix-init.sh"]

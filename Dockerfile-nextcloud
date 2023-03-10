@@ -1,0 +1,5 @@
+FROM nextcloud:27-fpm-alpine
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+RUN sed -i -r "s/.*memory_limit.*/memory_limit = 128M/g" "$PHP_INI_DIR/php.ini"

@@ -1,0 +1,20 @@
+FROM alpine
+
+RUN apk --no-cache add \
+	minidlna
+
+RUN mkdir /var/run/minidlna
+
+RUN mkdir /var/cache/minidlna
+
+RUN chown minidlna:minidlna /var/run/minidlna
+
+RUN chown minidlna:minidlna /var/cache/minidlna
+
+COPY ./config/minidlna/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["/usr/sbin/minidlnad", "-S"]

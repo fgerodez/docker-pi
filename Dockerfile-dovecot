@@ -1,0 +1,18 @@
+FROM alpine
+
+RUN apk --no-cache add \
+	dovecot \
+	dovecot-sqlite \
+	dovecot-lmtpd \
+	dovecot-pigeonhole-plugin \
+	&& rm -rf /etc/dovecot/*
+
+RUN addgroup -g 5000 vmail
+
+RUN adduser -u 5000 -H -h /var/mail -G vmail -D vmail
+
+COPY ./config/dovecot/dovecot-init.sh /
+
+RUN chmod +x /dovecot-init.sh
+
+CMD ["/dovecot-init.sh"]

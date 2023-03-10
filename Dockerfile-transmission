@@ -1,0 +1,10 @@
+FROM debian:12-slim
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV CONFIG_DIR /var/lib/transmission
+
+RUN apt update && apt install -yqq \
+    transmission-daemon \
+	&& rm -rf /var/lib/apt/lists/*
+
+CMD /usr/bin/transmission-daemon -f --config-dir ${CONFIG_DIR} --log-debug
