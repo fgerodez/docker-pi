@@ -2,6 +2,4 @@ FROM alpine:3.18
 
 RUN apk add --no-cache opendkim
 
-COPY ./config/opendkim/opendkim.conf /etc/opendkim/opendkim.conf
-
 CMD ["/usr/sbin/opendkim", "-f"]
