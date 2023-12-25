@@ -8,4 +8,4 @@ RUN apt update && apt install -yqq \
 	postfix-policyd-spf-python \
 	&& rm -rf /var/lib/apt/lists/*
 
-CMD ["/usr/sbin/postfix" "start-fg"]
+CMD ["/usr/sbin/postfix", "start-fg"]

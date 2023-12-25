@@ -11,4 +11,4 @@ RUN addgroup -g 5000 vmail
 
 RUN adduser -u 5000 -H -h /var/mail -G vmail -D vmail
 
-CMD ["/usr/sbin/dovecot" "-F"]
+CMD ["/usr/sbin/dovecot", "-F"]
