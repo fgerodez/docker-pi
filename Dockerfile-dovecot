@@ -11,8 +11,4 @@ RUN addgroup -g 5000 vmail
 
 RUN adduser -u 5000 -H -h /var/mail -G vmail -D vmail
 
-COPY ./config/dovecot/dovecot-init.sh /
-
-RUN chmod +x /dovecot-init.sh
-
-CMD ["/dovecot-init.sh"]
+CMD ["/usr/sbin/dovecot" "-F"]
