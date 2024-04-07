@@ -2,26 +2,36 @@ FROM debian:12-slim
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Install necessary packages and clean up the package cache
 RUN apt update && apt install -yqq \
-	dirmngr \
-	ca-certificates \
-	gnupg \
+	curl \
+	sqlite3 \
 	wget \
 	&& rm -rf /var/lib/apt/lists/*
 
-#Mono repository
-RUN gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF \
-	&& echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/debian stable-buster main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+# Create a non-root user for Sonarr and set up its directory
+RUN useradd -U --system --no-create-home --shell=/sbin/nologin sonarr \
+	&& mkdir /var/lib/sonarr \
+    && chown sonarr:sonarr /var/lib/sonarr
 
-#Media Area repository
-RUN wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-21_all.deb && dpkg -i repo-mediaarea_1.0-21_all.deb \
-    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 2009837CBFFD68F45BC180471F4F90DE2A9B4BF8
+# Determine and download the appropriate Sonarr release based on architecture
+RUN ARCH=$(dpkg --print-architecture) \
+    && DLBASE="https://services.sonarr.tv/v1/download/$branch/latest?version=4&os=linux" \
+    && case "$ARCH" in \
+        "amd64") DLURL="${DLBASE}&arch=x64" ;; \
+        "armhf") DLURL="${DLBASE}&arch=arm" ;; \
+        "arm64") DLURL="${DLBASE}&arch=arm64" ;; \
+        *) \
+            echo "Architecture non prise en charge: $ARCH" \
+            && exit 1 \
+            ;; \
+        esac \
+    && wget --content-disposition "$DLURL" -O sonarr.tar.gz \
+    && tar -xzf sonarr.tar.gz -C /opt/ \
+    && chown -R sonarr:sonarr /opt/Sonarr \
+    && rm sonarr.tar.gz
 
-#Sonarr repository
-RUN	echo "deb https://apt.sonarr.tv/debian buster main" | tee /etc/apt/sources.list.d/sonarr.list
+USER sonarr
+WORKDIR /opt/Sonarr
 
-RUN apt update && apt install -yqq \
-	sonarr \
-	&& rm -rf /var/lib/apt/lists/*
-
-CMD ["/usr/bin/mono", "--debug", "/usr/lib/sonarr/bin/Sonarr.exe", "-nobrowser", "-data=/var/lib/sonarr"]
+CMD ["/opt/Sonarr/Sonarr", "-nobrowser", "-data=/var/lib/sonarr"]
