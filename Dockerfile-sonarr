@@ -16,7 +16,7 @@ RUN useradd -U --system --no-create-home --shell=/sbin/nologin sonarr \
 
 # Determine and download the appropriate Sonarr release based on architecture
 RUN ARCH=$(dpkg --print-architecture) \
-    && DLBASE="https://services.sonarr.tv/v1/download/$branch/latest?version=4&os=linux" \
+    && DLBASE="https://services.sonarr.tv/v1/download/main/latest?version=4&os=linux" \
     && case "$ARCH" in \
         "amd64") DLURL="${DLBASE}&arch=x64" ;; \
         "armhf") DLURL="${DLBASE}&arch=arm" ;; \
