@@ -7,6 +7,7 @@ RUN apt update && apt install -yqq \
 	curl \
 	sqlite3 \
 	wget \
+    libicu-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for Sonarr and set up its directory
