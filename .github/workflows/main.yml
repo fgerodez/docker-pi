@@ -2,36 +2,21 @@ name: scan-vulnerabilities
 on:
   workflow_dispatch:
 jobs:
-  build:
-    name: Build
+  scan-security:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        image: ['mahoneko/nextcloud:latest', 'mahoneko/postfix:latest', 'mahoneko/dovecot:latest']  
     steps:
       - name: Nextcloud
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: 'mahoneko/nextcloud:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
+          image-ref: ${{ matrix.image }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
 
-      - name: Postfix
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          image-ref: 'mahoneko/postfix:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Dovecot
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: 'mahoneko/dovecot:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          sarif_file: 'trivy-results.sarif'
