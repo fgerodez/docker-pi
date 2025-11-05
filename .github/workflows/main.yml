@@ -6,10 +6,30 @@ jobs:
     name: Build
     runs-on: ubuntu-24.04
     steps:
-      - name: Run Trivy vulnerability scanner
+      - name: Nextcloud
         uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: 'mahoneko/nextcloud:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Postfix
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: 'mahoneko/postfix:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Dovecot
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: 'mahoneko/dovecot:latest'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
