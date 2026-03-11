@@ -14,7 +14,7 @@ RUN sed -i 's/Components: main$/Components: main contrib non-free non-free-firmw
 	&& rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for Sonarr and set up its directory
-RUN useradd -U --system --no-create-home --shell=/sbin/nologin bazarr \
+RUN useradd -U --system --no-create-home --shell=/sbin/nologin bazarr
 
 # Download & install Bazarr
 RUN wget --content-disposition "https://github.com/morpheus65535/bazarr/releases/latest/download/bazarr.zip" -O bazarr.zip \
