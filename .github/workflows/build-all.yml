@@ -1,4 +1,4 @@
-name: build-prowlarr
+name: build-all
 
 on:
   workflow_dispatch:
@@ -6,10 +6,17 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-                
+    strategy:
+      matrix:
+        include:
+          - image_tag: mahoneko/prowlarr:latest
+            dockerfile: ./Dockerfile-prowlarr
+          - image_tag: mahoneko/bazarr:latest
+            dockerfile: ./Dockerfile-bazarr
+
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -23,10 +30,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: |
-            linux/amd64
-            linux/arm64
+          context: .
+          platforms: linux/amd64
           push: true
-          file: ./Dockerfile-prowlarr
-          tags: mahoneko/prowlarr:latest
-        
+          file: ${{ matrix.dockerfile }}
+          tags: ${{ matrix.image_tag }}
