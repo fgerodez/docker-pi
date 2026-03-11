@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN sed -i 's/Components: main$/Components: main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources \
 	&& apt update && apt install -yqq \
 	7zip \
+    wget \
 	python3-dev \
 	python3-pip \
 	python3-setuptools \
