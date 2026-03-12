@@ -29,4 +29,4 @@ RUN wget --content-disposition "https://github.com/morpheus65535/bazarr/releases
 USER bazarr
 WORKDIR /opt/bazarr
 
-CMD ["/usr/bin/python3", "bazarr.py", "-no-update", "--config", "/config"]
+CMD ["/usr/bin/python3", "bazarr.py", "-c", "/config", "--no-update"]
