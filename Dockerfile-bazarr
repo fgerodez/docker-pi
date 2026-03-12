@@ -23,6 +23,7 @@ RUN wget --content-disposition "https://github.com/morpheus65535/bazarr/releases
     && chown -R bazarr:bazarr /opt/bazarr \
     && rm bazarr.zip \
 	&& cd /opt/bazarr \
+    && find / -type f -name EXTERNALLY-MANAGED -execdir mv {} EXTERNALLY-MANAGED.bkp \; \
 	&& python3 -m pip install -r requirements.txt
 
 USER bazarr
